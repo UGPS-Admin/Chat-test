@@ -139,3 +139,12 @@ function addMessageToListDOM(text, member) {
     el.scrollTop = el.scrollHeight - el.clientHeight;
   }
 }
+drone.on('data', (text, member) => {
+  if (member) {
+    const bannedWords = ['hello', 'hi'];
+    const updatedText = replaceWordsWithHashtags(text, bannedWords);
+    addMessageToListDOM(updatedText, member);
+  } else {
+    // Message is from server
+  }
+});
