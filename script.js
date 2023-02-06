@@ -8,15 +8,6 @@ const drone = new ScaleDrone(CLIENT_ID, {
     color: getRandomColor(),
   },
 });
-drone.on('data', (text, member) => {
-  if (member) {
-    const bannedWords = ['hello', 'hi'];
-    const updatedText = replaceWordsWithHashtags(text, bannedWords);
-    addMessageToListDOM(updatedText, member);
-  } else {
-    // Message is from server
-  }
-});
 let members = [];
 
 drone.on('open', error => {
@@ -57,7 +48,16 @@ drone.on('open', error => {
     }
   });
 });
-
+room.on('data', (text, member) => {
+    if (member) {
+      const bannedWords = ['hello', 'hi'];
+      const updatedText = replaceWordsWithHashtags(text, bannedWords);
+      addMessageToListDOM(updatedText, member);
+    } else {
+      // Message is from server
+    }
+  });
+});
 drone.on('close', event => {
   console.log('Connection was closed', event);
 });
