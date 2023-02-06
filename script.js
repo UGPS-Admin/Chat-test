@@ -1,5 +1,3 @@
-// PS! Replace this with your own channel ID
-// If you use this channel ID your app will stop working in the future
 const CLIENT_ID = 'rB9bHuU6T9SElL0D';
 
 const drone = new ScaleDrone(CLIENT_ID, {
@@ -47,8 +45,8 @@ drone.on('open', error => {
       // Message is from server
     }
   });
-});
-room.on('data', (text, member) => {
+
+  room.on('data', (text, member) => {
     if (member) {
       const bannedWords = ['hello', 'hi'];
       const updatedText = replaceWordsWithHashtags(text, bannedWords);
@@ -58,6 +56,7 @@ room.on('data', (text, member) => {
     }
   });
 });
+
 drone.on('close', event => {
   console.log('Connection was closed', event);
 });
