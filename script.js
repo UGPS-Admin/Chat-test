@@ -8,7 +8,15 @@ const drone = new ScaleDrone(CLIENT_ID, {
     color: getRandomColor(),
   },
 });
-
+drone.on('data', (text, member) => {
+  if (member) {
+    const bannedWords = ['hello', 'hi'];
+    const updatedText = replaceWordsWithHashtags(text, bannedWords);
+    addMessageToListDOM(updatedText, member);
+  } else {
+    // Message is from server
+  }
+});
 let members = [];
 
 drone.on('open', error => {
@@ -122,7 +130,6 @@ function updateMembersDOM() {
     DOM.membersList.appendChild(createMemberElement(member))
   );
 }
-
 function createMessageElement(text, member) {
   const el = document.createElement('div');
   el.appendChild(createMemberElement(member));
@@ -139,12 +146,3 @@ function addMessageToListDOM(text, member) {
     el.scrollTop = el.scrollHeight - el.clientHeight;
   }
 }
-drone.on('data', (text, member) => {
-  if (member) {
-    const bannedWords = ['hello', 'hi'];
-    const updatedText = replaceWordsWithHashtags(text, bannedWords);
-    addMessageToListDOM(updatedText, member);
-  } else {
-    // Message is from server
-  }
-});
