@@ -75,21 +75,9 @@ function getRandomName() {
     nouns[Math.floor(Math.random() * nouns.length)]
   );
 }
-
 function getRandomColor() {
   return '#' + Math.floor(Math.random() * 0xFFFFFF).toString(16);
 }
-
-drone.on('data', (text, member) => {
-  if (member) {
-    const bannedWords = ['hello', 'hi'];
-    const updatedText = replaceWordsWithHashtags(text, bannedWords);
-    addMessageToListDOM(updatedText, member);
-  } else {
-    // Message is from server
-  }
-});
-
 //------------- DOM STUFF
 
 const DOM = {
