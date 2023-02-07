@@ -58,7 +58,7 @@ function replaceWordsWithHashtags(message) {
 
 const Scaledrone = require('scaledrone-node');
 
-const room = new Scaledrone('YOUR_SCALEDRONE_CHANNEL_ID');
+const room = new Scaledrone('rB9bHuU6T9SElL0D');
 room.on('open', error => {
   if (error) {
     return console.error(error);
