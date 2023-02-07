@@ -37,18 +37,10 @@ drone.on('open', error => {
     members.splice(index, 1);
     updateMembersDOM();
   });
-
+  
   room.on('data', (text, member) => {
     if (member) {
-      addMessageToListDOM(text, member);
-    } else {
-      // Message is from server
-    }
-  });
-
-  room.on('data', (text, member) => {
-    if (member) {
-      const bannedWords = ['hello', 'hi'];
+      const bannedWords = ['fuck', 'niger'];
       const updatedText = replaceWordsWithHashtags(text, bannedWords);
       addMessageToListDOM(updatedText, member);
     } else {
