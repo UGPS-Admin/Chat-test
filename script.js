@@ -38,16 +38,24 @@ drone.on('open', error => {
     updateMembersDOM();
   });
   
-  room.on('data', (text, member) => {
-    if (member) {
-      const bannedWords = ['fuck', 'niger'];
-      const updatedText = replaceWordsWithHashtags(text, bannedWords);
-      addMessageToListDOM(updatedText, member);
-    } else {
-      // Message is from server
-    }
-  });
+room.on('data', (text, member) => {
+  if (member) {
+    const bannedWords = ['hello', 'badword2'];
+    const updatedText = replaceWordsWithHashtags(text, bannedWords);
+    addMessageToListDOM(updatedText, member);
+  } else {
+    // Message is from server
+  }
 });
+
+function replaceWordsWithHashtags(text, bannedWords) {
+  bannedWords.forEach(bannedWord => {
+    const regex = new RegExp(bannedWord, 'g');
+    text = text.replace(regex, `#${bannedWord}`);
+  });
+
+  return text;
+}
 
 drone.on('close', event => {
   console.log('Connection was closed', event);
