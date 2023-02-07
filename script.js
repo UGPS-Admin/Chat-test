@@ -1,55 +1,67 @@
 const CLIENT_ID = 'rB9bHuU6T9SElL0D';
+const BANNED_WORDS = ['hello', 'badword2'];
 
 const drone = new ScaleDrone(CLIENT_ID, {
-  data: { // Will be sent out as clientData via events
+  data: {
     name: getRandomName(),
     color: getRandomColor(),
   },
 });
+
 let members = [];
 
-drone.on('open', error => {
+drone.on('open', (error) => {
   if (error) {
     return console.error(error);
   }
+
   console.log('Successfully connected to Scaledrone');
 
   const room = drone.subscribe('observable-room');
-  room.on('open', error => {
+  room.on('open', (error) => {
     if (error) {
       return console.error(error);
     }
+
     console.log('Successfully joined room');
   });
 
-  room.on('members', m => {
-    members = m;
-    updateMembersDOM();
+  room.on('members', (roomMembers) => {
+    members = roomMembers;
+    updateMembers();
   });
 
-  room.on('member_join', member => {
-    members.push(member);
-    updateMembersDOM();
+  room.on('member_join', (newMember) => {
+    members.push(newMember);
+    updateMembers();
   });
 
-  room.on('member_leave', ({id}) => {
-    const index = members.findIndex(member => member.id === id);
+  room.on('member_leave', ({ id }) => {
+    const index = members.findIndex((member) => member.id === id);
     members.splice(index, 1);
-    updateMembersDOM();
+    updateMembers();
   });
-  
-room.on('data', (text, member) => {
-  if (member) {
-    const bannedWords = ['hello', 'badword2'];
-    const updatedText = replaceWordsWithHashtags(text, bannedWords);
-    addMessageToListDOM(updatedText, member);
-  } else {
-    // Message is from server
-  }
+
+  room.on('data', (text, member) => {
+    if (member) {
+      const updatedText = replaceBannedWordsWithHashtags(text);
+      addMessageToList(updatedText, member);
+    } else {
+      // Message is from server
+    }
+  });
 });
 
-function replaceWordsWithHashtags(text, bannedWords) {
-  bannedWords.forEach(bannedWord => {
+drone.on('close', (event) => {
+  console.log('Connection was closed', event);
+});
+
+drone.on('error', (error) => {
+  console.error(error);
+});
+
+function replaceBannedWordsWithHashtags(text) {
+  BANNED_WORDS.forEach((bannedWord) => {
     const regex = new RegExp(bannedWord, 'g');
     text = text.replace(regex, `#${bannedWord}`);
   });
@@ -57,13 +69,17 @@ function replaceWordsWithHashtags(text, bannedWords) {
   return text;
 }
 
-drone.on('close', event => {
-  console.log('Connection was closed', event);
-});
+function updateMembers() {
+  DOM.membersCount.textContent = members.length;
+  DOM.membersList.innerHTML = members
+    .map((member) => `<li style="color:${member.clientData.color}">${member.clientData.name}</li>`)
+    .join('');
+}
 
-drone.on('error', error => {
-  console.error(error);
-});
+function addMessageToList(text, member) {
+  const messageEl = document.createElement('li');
+  messageEl.innerHTML = `
+    <span class="message-username" style="color:${member.client
 
 function getRandomName() {
   const adjs = ["autumn", "hidden", "bitter", "misty", "silent", "empty", "dry", "dark", "summer", "icy", "delicate", "quiet", "white", "cool", "spring", "winter", "patient", "twilight", "dawn", "crimson", "wispy", "weathered", "blue", "billowing", "broken", "cold", "damp", "falling", "frosty", "green", "long", "late", "lingering", "bold", "little", "morning", "muddy", "old", "red", "rough", "still", "small", "sparkling", "throbbing", "shy", "wandering", "withered", "wild", "black", "young", "holy", "solitary", "fragrant", "aged", "snowy", "proud", "floral", "restless", "divine", "polished", "ancient", "purple", "lively", "nameless"];
