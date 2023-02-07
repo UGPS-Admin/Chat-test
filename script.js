@@ -48,6 +48,40 @@ drone.on('open', error => {
   });
 });
 
+function replaceWordsWithHashtags(message) {
+  // Define the words you want to replace
+  const wordsToReplace = ['hello', 'world'];
+
+  // Replace each word with the same number of hashtags as the length of the word
+  let updatedMessage = message;
+  wordsToReplace.forEach(word => {
+    const regex = new RegExp(`\\b${word}\\b`, 'g');
+    const hashtags = '#'.repeat(word.length);
+    updatedMessage = updatedMessage.replace(regex, hashtags);
+  });
+
+  return updatedMessage;
+}
+
+const Scaledrone = require('scaledrone-node');
+
+const room = new Scaledrone('rB9bHuU6T9SElL0D');
+room.on('open', error => {
+  if (error) {
+    return console.error(error);
+  }
+
+  room.on('message', (message) => {
+    // Replace certain words in the message
+    const updatedMessage = replaceWordsWithHashtags(message.data);
+
+    // Broadcast the updated message to all clients in the room
+    room.publish({
+      message: updatedMessage
+    });
+  });
+});
+
 drone.on('close', event => {
   console.log('Connection was closed', event);
 });
