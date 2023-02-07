@@ -1,5 +1,4 @@
 const CLIENT_ID = 'rB9bHuU6T9SElL0D';
-const BANNED_WORDS = ['hello', 'badword2'];
 
 const drone = new ScaleDrone(CLIENT_ID, {
   data: {
@@ -42,13 +41,37 @@ drone.on('open', (error) => {
     updateMembers();
   });
 
-  room.on('data', (text, member) => {
-    if (member) {
-      const updatedText = replaceBannedWordsWithHashtags(text);
-      addMessageToList(updatedText, member);
-    } else {
-      // Message is from server
-    }
+function replaceWordsWithHashtags(message) {
+  // Define the words you want to replace
+  const wordsToReplace = ['hello', 'world'];
+
+  // Replace each word with the same number of hashtags as the length of the word
+  let updatedMessage = message;
+  wordsToReplace.forEach(word => {
+    const regex = new RegExp(`\\b${word}\\b`, 'g');
+    const hashtags = '#'.repeat(word.length);
+    updatedMessage = updatedMessage.replace(regex, hashtags);
+  });
+
+  return updatedMessage;
+}
+
+const Scaledrone = require('scaledrone-node');
+
+const room = new Scaledrone('YOUR_SCALEDRONE_CHANNEL_ID');
+room.on('open', error => {
+  if (error) {
+    return console.error(error);
+  }
+
+  room.on('message', (message) => {
+    // Replace certain words in the message
+    const updatedMessage = replaceWordsWithHashtags(message.data);
+
+    // Broadcast the updated message to all clients in the room
+    room.publish({
+      message: updatedMessage
+    });
   });
 });
 
@@ -59,15 +82,6 @@ drone.on('close', (event) => {
 drone.on('error', (error) => {
   console.error(error);
 });
-
-function replaceBannedWordsWithHashtags(text) {
-  BANNED_WORDS.forEach((bannedWord) => {
-    const regex = new RegExp(bannedWord, 'g');
-    text = text.replace(regex, `#${bannedWord}`);
-  });
-
-  return text;
-}
 
 function updateMembers() {
   DOM.membersCount.textContent = members.length;
