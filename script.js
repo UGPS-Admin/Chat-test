@@ -1,7 +1,7 @@
 const CLIENT_ID = 'rB9bHuU6T9SElL0D';
 
 const drone = new ScaleDrone(CLIENT_ID, {
-  data: {
+  data: { // Will be sent out as clientData via events
     name: getRandomName(),
     color: getRandomColor(),
   },
@@ -9,91 +9,52 @@ const drone = new ScaleDrone(CLIENT_ID, {
 
 let members = [];
 
-drone.on('open', (error) => {
+drone.on('open', error => {
   if (error) {
     return console.error(error);
   }
-
   console.log('Successfully connected to Scaledrone');
 
   const room = drone.subscribe('observable-room');
-  room.on('open', (error) => {
+  room.on('open', error => {
     if (error) {
       return console.error(error);
     }
-
     console.log('Successfully joined room');
   });
 
-  room.on('members', (roomMembers) => {
-    members = roomMembers;
-    updateMembers();
+  room.on('members', m => {
+    members = m;
+    updateMembersDOM();
   });
 
-  room.on('member_join', (newMember) => {
-    members.push(newMember);
-    updateMembers();
+  room.on('member_join', member => {
+    members.push(member);
+    updateMembersDOM();
   });
 
-  room.on('member_leave', ({ id }) => {
-    const index = members.findIndex((member) => member.id === id);
+  room.on('member_leave', ({id}) => {
+    const index = members.findIndex(member => member.id === id);
     members.splice(index, 1);
-    updateMembers();
+    updateMembersDOM();
   });
 
-function replaceWordsWithHashtags(message) {
-  // Define the words you want to replace
-  const wordsToReplace = ['hello', 'world'];
-
-  // Replace each word with the same number of hashtags as the length of the word
-  let updatedMessage = message;
-  wordsToReplace.forEach(word => {
-    const regex = new RegExp(`\\b${word}\\b`, 'g');
-    const hashtags = '#'.repeat(word.length);
-    updatedMessage = updatedMessage.replace(regex, hashtags);
-  });
-
-  return updatedMessage;
-}
-
-const Scaledrone = require('scaledrone-node');
-
-const room = new Scaledrone('rB9bHuU6T9SElL0D');
-room.on('open', error => {
-  if (error) {
-    return console.error(error);
-  }
-
-  room.on('message', (message) => {
-    // Replace certain words in the message
-    const updatedMessage = replaceWordsWithHashtags(message.data);
-
-    // Broadcast the updated message to all clients in the room
-    room.publish({
-      message: updatedMessage
-    });
+  room.on('data', (text, member) => {
+    if (member) {
+      addMessageToListDOM(text, member);
+    } else {
+      // Message is from server
+    }
   });
 });
 
-drone.on('close', (event) => {
+drone.on('close', event => {
   console.log('Connection was closed', event);
 });
 
-drone.on('error', (error) => {
+drone.on('error', error => {
   console.error(error);
 });
-
-function updateMembers() {
-  DOM.membersCount.textContent = members.length;
-  DOM.membersList.innerHTML = members
-    .map((member) => `<li style="color:${member.clientData.color}">${member.clientData.name}</li>`)
-    .join('');
-}
-
-function addMessageToList(text, member) {
-  const messageEl = document.createElement('li');
-  messageEl.innerHTML = `
-    <span class="message-username" style="color:${member.client
 
 function getRandomName() {
   const adjs = ["autumn", "hidden", "bitter", "misty", "silent", "empty", "dry", "dark", "summer", "icy", "delicate", "quiet", "white", "cool", "spring", "winter", "patient", "twilight", "dawn", "crimson", "wispy", "weathered", "blue", "billowing", "broken", "cold", "damp", "falling", "frosty", "green", "long", "late", "lingering", "bold", "little", "morning", "muddy", "old", "red", "rough", "still", "small", "sparkling", "throbbing", "shy", "wandering", "withered", "wild", "black", "young", "holy", "solitary", "fragrant", "aged", "snowy", "proud", "floral", "restless", "divine", "polished", "ancient", "purple", "lively", "nameless"];
@@ -104,9 +65,11 @@ function getRandomName() {
     nouns[Math.floor(Math.random() * nouns.length)]
   );
 }
+
 function getRandomColor() {
   return '#' + Math.floor(Math.random() * 0xFFFFFF).toString(16);
 }
+
 //------------- DOM STUFF
 
 const DOM = {
@@ -147,6 +110,7 @@ function updateMembersDOM() {
     DOM.membersList.appendChild(createMemberElement(member))
   );
 }
+
 function createMessageElement(text, member) {
   const el = document.createElement('div');
   el.appendChild(createMemberElement(member));
