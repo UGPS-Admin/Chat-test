@@ -49,6 +49,19 @@ drone.on('open', error => {
   });
 });
 
+function replaceWordsWithHashtags(string, wordsToReplace) {
+  wordsToReplace.forEach(word => {
+    string = string.replace(word, "#".repeat(word.length));
+  });
+  return string;
+}
+
+// Example usage:
+const inputString = "Hello world! How are you today?";
+const wordsToReplace = ["Hello", "world", "you", "today"];
+const outputString = replaceWordsWithHashtags(inputString, wordsToReplace);
+console.log(outputString);
+
 drone.on('close', event => {
   console.log('Connection was closed', event);
 });
