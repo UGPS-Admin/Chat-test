@@ -72,10 +72,10 @@ drone.on("open", error => {
       const inputString = data;
       const wordsToReplace = ["hello", "world", "you", "today"];
       const outputString = replaceWordsWithHashtags(inputString, wordsToReplace);
-      // Republish the transformed string in the Scaledrone channel
-      room.publish({
-        message: outputString
-      });
+      // Display the transformed string in the chat room
+      const chatMessage = document.createElement("div");
+      chatMessage.innerHTML = outputString;
+      document.querySelector("#chat-room").appendChild(chatMessage);
     }
   });
 });
