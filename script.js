@@ -49,6 +49,10 @@ drone.on('open', error => {
   });
 });
 
+// Create Scaledrone instance
+const drone = new Scaledrone("rB9bHuU6T9SElL0D");
+
+// Replace words with hashtags function
 function replaceWordsWithHashtags(string, wordsToReplace) {
   wordsToReplace.forEach(word => {
     string = string.replace(word, "#".repeat(word.length));
@@ -56,11 +60,25 @@ function replaceWordsWithHashtags(string, wordsToReplace) {
   return string;
 }
 
-// Example usage:
-const inputString = "Hello world! How are you today?";
-const wordsToReplace = ["Hello", "world", "you", "today"];
-const outputString = replaceWordsWithHashtags(inputString, wordsToReplace);
-console.log(outputString);
+// Subscribe to Scaledrone channel
+drone.on("open", error => {
+  if (error) {
+    return console.error(error);
+  }
+  const room = drone.subscribe("observable-room");
+  room.on("data", (data, member) => {
+    // If the message is a string, replace the words with hashtags
+    if (typeof data === "string") {
+      const inputString = data;
+      const wordsToReplace = ["hello", "world", "you", "today"];
+      const outputString = replaceWordsWithHashtags(inputString, wordsToReplace);
+      // Republish the transformed string in the Scaledrone channel
+      room.publish({
+        message: outputString
+      });
+    }
+  });
+});
 
 drone.on('close', event => {
   console.log('Connection was closed', event);
