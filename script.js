@@ -49,9 +49,6 @@ drone.on('open', error => {
   });
 });
 
-// Create Scaledrone instance
-const drone = new Scaledrone("rB9bHuU6T9SElL0D");
-
 // Replace words with hashtags function
 function replaceWordsWithHashtags(string, wordsToReplace) {
   wordsToReplace.forEach(word => {
