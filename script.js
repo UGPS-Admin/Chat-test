@@ -49,32 +49,21 @@ drone.on('open', error => {
   });
 });
 
-// Replace words with hashtags function
-function replaceWordsWithHashtags(string, wordsToReplace) {
-  wordsToReplace.forEach(word => {
-    string = string.replace(word, "#".repeat(word.length));
+const badWords = ["bad", "ugly"];
+
+function replaceBadWords(message) {
+  badWords.forEach(word => {
+    const regex = new RegExp(word, 'gi');
+    message = message.replace(regex, '#');
   });
-  return string;
+  return message;
 }
 
-// Subscribe to Scaledrone channel
-drone.on("open", error => {
-  if (error) {
-    return console.error(error);
-  }
-  const room = drone.subscribe("observable-room");
-  room.on("data", (data, member) => {
-    // If the message is a string, replace the words with hashtags
-    if (typeof data === "string") {
-      const inputString = data;
-      const wordsToReplace = ["hello", "world", "you", "today"];
-      const outputString = replaceWordsWithHashtags(inputString, wordsToReplace);
-      // Display the transformed string in the chat room
-      const chatMessage = document.createElement("div");
-      chatMessage.innerHTML = outputString;
-      document.querySelector("#chat-room").appendChild(chatMessage);
-    }
-  });
+const room = drone.subscribe('observable-room');
+
+room.on('data', (data) => {
+  const message = replaceBadWords(data.message);
+  console.log(message);
 });
 
 drone.on('close', event => {
