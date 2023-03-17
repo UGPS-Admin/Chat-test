@@ -1,4 +1,3 @@
-
 const CLIENT_ID = 'rB9bHuU6T9SElL0D';
 
 const drone = new ScaleDrone(CLIENT_ID, {
@@ -50,11 +49,6 @@ drone.on('open', error => {
 });
 
 const room = drone.subscribe('observable-room');
-
-room.on('data', (data) => {
-  const message = replaceBadWords(data.message);
-  console.log(message);
-});
 
 drone.on('close', event => {
   console.log('Connection was closed', event);
@@ -123,16 +117,5 @@ function createMessageElement(text, member) {
   const el = document.createElement('div');
   el.appendChild(createMemberElement(member));
   el.appendChild(document.createTextNode(text));
-  el.className = 'message';
-  return el;
-}
-
-function addMessageToListDOM(text, member) {
-  const el = DOM.messages;
-  const wasTop = el.scrollTop === el.scrollHeight - el.clientHeight;
-  el.appendChild(createMessageElement(text, member));
-  if (wasTop) {
-    el.scrollTop = el.scrollHeight - el.clientHeight;
-  }
-}
+  el.className = 'message
 
