@@ -48,7 +48,6 @@ drone.on('open', error => {
   });
 });
 
-const room = drone.subscribe('observable-room');
 
 drone.on('close', event => {
   console.log('Connection was closed', event);
