@@ -79,7 +79,7 @@ function getRandomName() {
   const nouns = ["Admin"];
   return (
     adjs[Math.floor(Math.random() * adjs.length)] +
-    "_" +
+    " " +
     nouns[Math.floor(Math.random() * nouns.length)]
   );
 }
